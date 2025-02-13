@@ -12,16 +12,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: checkout pages branch
+      uses: actions/checkout@v4
+      with:
+        ref: github-pages
     - name: use node.js
       uses: actions/setup-node@v4
       with:
         node-version: 'v14.x'
     - name: install deps
       run: npm ci
-    - name: checkout pages branch
-      uses: actions/checkout@v4
-      with:
-        ref: github-pages
     - name: push build
       run: |
         git config --global user.name 'Ewan Dennis'
