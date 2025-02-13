@@ -5,29 +5,37 @@ name: build and deploy page
 
 on: [push]
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: checkout pages branch
       uses: actions/checkout@v4
-      with:
-        ref: github-pages
     - name: use node.js
       uses: actions/setup-node@v4
       with:
         node-version: 'v14.x'
     - name: install deps
       run: npm ci
-    - name: push build
+    - name: build
       run: |
-        git config --global user.name 'Ewan Dennis'
-        git config --global user.email 'ewandennis@users.noreply.github.com'
-        mkdir -p build/
-        cp node_modules/two.js/build/two.js build/
-        git add build
-        git commit -m 'Build action'
-        git push
+        mkdir -p build/node_modules/two.js/build
+        cp node_modules/two.js/build/two.js build/node_modules/two.js/build/
+        cp index.html build/
+    - name: upload build
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy build
+        id: deployment
+        uses: actions/deploy-pages@v4
