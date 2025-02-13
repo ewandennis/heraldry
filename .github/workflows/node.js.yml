@@ -20,6 +20,7 @@ jobs:
     - name: build
       run: |
         mkdir -p build/node_modules/two.js/build
+        cp *.js build/
         cp node_modules/two.js/build/two.js build/node_modules/two.js/build/
         cp index.html build/
     - name: upload build
