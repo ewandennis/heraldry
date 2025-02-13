@@ -26,7 +26,7 @@ jobs:
       run: |
         git config --global user.name 'Ewan Dennis'
         git config --global user.email 'ewandennis@users.noreply.github.com'
-        mkdir build/
+        mkdir -p build/
         cp node_modules/two.js/build/two.js build/
         git add build
         git commit -m 'Build action'
