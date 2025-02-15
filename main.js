@@ -99,7 +99,33 @@ class ChequerPattern extends Two.Group {
   }
 }
 
-const PATTERNS = ['flat', 'stripe', 'chequer'];
+const MAX_ZIGZAGS = 3;
+class ZigzagPattern extends Two.Group {
+  constructor({ w, h, size, colour, angle, two}) {
+    super();
+    const zigSize = w * size;
+    const zagSize = zigSize * Math.tan(Math.PI / 4);
+    for (let nZigZags = 0, y = -h/2 + zigSize; nZigZags < MAX_ZIGZAGS && y < h/2 - zigSize; nZigZags++, y += zigSize*3) {
+      let verts = [];
+      let zigOrZag = true;
+      for (let x = -w; x <= w; x += zigSize) {
+        const yy = y + (zigOrZag * zagSize);
+        verts.push(new Two.Anchor(x, yy, 0, 0, 0, 0));
+        zigOrZag = !zigOrZag;
+      }
+      const zigzag = two.makePath(verts);
+      zigzag.stroke = colour;
+      zigzag.linewidth = zigSize;
+      zigzag.noFill();
+      zigzag.closed = false;
+      this.add(zigzag);
+    }
+    this.rotation = angle;
+    two.add(this);
+  }
+}
+
+const PATTERNS = ['flat', 'stripe', 'chequer', 'zigzag'];
 
 const capitalise = s => s[0].toUpperCase() + s.slice(1);
 
@@ -149,17 +175,18 @@ const makeHeraldGo = () => {
   bg.noStroke();
   bg.fill = '#333';
 
-  const GRID_H = 3;
-  const GRID_W = 5;
+  const GRID_H = 4;
+  const GRID_W = 3;
   for (let y = 0; y < GRID_H; y++) {
     for (let x = 0; x < GRID_W; x++) {
       const colours = COLOURS[randInt(COLOURS.length)];
+      const pattern = PATTERNS[randInt(PATTERNS.length)];
       const shield = new Herald({
         bg: colours[0],
         fg: colours[1],
-        pattern: PATTERNS[randInt(PATTERNS.length)],
-        size: 0.2,
-        angle: ANGLES[randInt(ANGLES.length)],
+        pattern,
+        size: pattern != 'zigzag' ? 0.2 : 0.1,
+        angle: pattern != 'zigzag' ? ANGLES[randInt(ANGLES.length)] : 0,
         two
       });
       shield.scale = 0.4;
