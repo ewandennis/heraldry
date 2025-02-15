@@ -99,6 +99,7 @@ class ChequerPattern extends Two.Group {
   }
 }
 
+const ZIGZAG_SIZES = [0.2, 0.1];
 const MAX_ZIGZAGS = 3;
 class ZigzagPattern extends Two.Group {
   constructor({ w, h, size, colour, angle, two}) {
@@ -175,27 +176,32 @@ const makeHeraldGo = () => {
   bg.noStroke();
   bg.fill = '#333';
 
-  const GRID_H = 4;
-  const GRID_W = 3;
+  const SCALE = 0.4;
+  const SPACING = 0.25;
+  const GRID_H = Math.floor(two.height / (SHIELD_H * (1+SPACING) * SCALE));
+  const GRID_W = Math.floor(two.width / (SHIELD_W * (1+SPACING) * SCALE));
   for (let y = 0; y < GRID_H; y++) {
     for (let x = 0; x < GRID_W; x++) {
       const colours = COLOURS[randInt(COLOURS.length)];
       const pattern = PATTERNS[randInt(PATTERNS.length)];
+      const size = pattern === 'zigzag' ? ZIGZAG_SIZES[randInt(ZIGZAG_SIZES.length)] : 0.2;
       const shield = new Herald({
         bg: colours[0],
         fg: colours[1],
         pattern,
-        size: pattern != 'zigzag' ? 0.2 : 0.1,
+        size,
         angle: pattern != 'zigzag' ? ANGLES[randInt(ANGLES.length)] : 0,
         two
       });
-      shield.scale = 0.4;
+      shield.scale = SCALE;
       shield.position.set((x+0.5) * (two.width/GRID_W), (y+0.5) * (two.height/GRID_H));
       two.add(shield);
     }
   }
 
   two.update();
+
+  window.two = two;
 };
 
 document.addEventListener('DOMContentLoaded', makeHeraldGo);
